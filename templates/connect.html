@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Connect Your Shop</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f4f6fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background: white;
+      padding: 2rem 3rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .btn {
+      background-color: #189eff;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: #007bdb;
+    }
+  </style>
+  <script>
+    function sendReadyState() {
+      window.parent.postMessage('sw-app-loaded', '*');
+    }
+
+    function connectShop() {
+      alert('Connecting to external service...');
+      // You can redirect or trigger your backend logic here
+    }
+
+    sendReadyState();
+  </script>
+</head>
+<body>
+  <div class="container">
+
+    <!-- new: show the shop record passed in -->
+    <div style="text-align:left; margin-bottom:1.5rem; padding:1rem; background:#eef1f6; border-radius:4px;">
+      <h2>Shop Info</h2>
+      <p><strong>Shop ID:</strong> {{ shop.shop_id }}</p>
+      <p><strong>Shop URL:</strong> {{ shop.shop_url }}</p>
+      <p><strong>Registered at:</strong> {{ shop.confirmed_at or 'Not confirmed yet' }}</p>
+      <p><strong>SW Version:</strong> {{ shop.sw_version }}</p>
+    </div>
+    <h1>Connect Your Shop</h1>
+    <p>Click below to link your Shopware store with our external service.</p>
+    <a href="https://somewhere.com?{{request.url.query}}">A link</a>
+    <button class="btn" onclick="connectShop()">Connect</button>
+  </div>
+</body>
+</html>
