@@ -21,12 +21,11 @@
    
 ### What about the `api_deck_shopware_test` file?
 
-Well, that one I've created for testing the lifecycle from connecting a shop to 
-pull out its data.
+This one is for testing the lifecycle from connecting a shop to fetch its data using unified api.
 
 **Simplified script steps**
-1. Crates a consumer
-2. Creates a connection. [Shopware - Consumer]
+1. Create a consumer
+2. Create a connection. [Shopware - Consumer]
 3. Authorizes the connection
 4. Fetches products data using unify api
 
