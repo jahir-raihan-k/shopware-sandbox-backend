@@ -48,6 +48,11 @@ async def registration(
     sw_version: str|None = Header(None, alias="sw-version"),
     db: Session = Depends(get_db),
 ):
+    """
+    Registration handshake initiator. It gets called whenever a shop installs our
+    extension.
+    """
+
     # 1) verify Shopware’s signature on the raw query string
     await verify_header_signature(request, APP_SECRET, header_name="shopware-app-signature")
 
@@ -81,6 +86,11 @@ async def confirmation(
     data: ConfirmationRequest,
     db: Session = Depends(get_db),
 ):
+    """
+    Registration confirmation endpoint. This is where shopware shares shop
+    auth credentials with us to access their admin & storefront apis.
+    """
+
     # 1) load shop to get its secret
     shop = db.query(Shop).filter(Shop.shop_id == data.shopId).first()
     if not shop:
@@ -103,6 +113,10 @@ async def connect(
     request: Request,
     db: Session = Depends(get_db),
 ):
+    """
+    Endpoint for rendering a html template to see if embedding Iframe works.
+    """
+
     shop_id = request.query_params.get("shop-id")
     shop_url = request.query_params.get("shop-url")
 
@@ -118,6 +132,37 @@ async def connect(
     await verify_query_param_signature(request, shop_secret=shop.shop_secret)
 
     return templates.TemplateResponse("connect.html", {"request": request, "shop": shop})
+
+# -- Tax-Provider endpoint (Its for test only) ----------------------
+@app.post("/provide-tax")
+async def provide_tax(request: Request, data: dict):
+    """
+    Test endpoint for checking if shopware is calling the endpoint during order
+    checkout process. Well I guess we'll have ton of work based on this endpoint.
+    """
+
+    breakpoint_variable = True  # Make a breakpoint here to debug.
+
+    dummy_data = {
+        # optional: Overwrite the tax of an line item
+        "lineItemTaxes": {
+            "unique-identifier-of-lineitem": [
+                {"tax":19,"taxRate":23,"price":19}
+            ]
+        },
+        # optional: Overwrite the tax of an delivery
+        "deliveryTaxes": {
+            "unique-identifier-of-delivery-position": [
+                {"tax":19,"taxRate":23,"price":19}
+            ]
+        },
+        # optional: Overwrite the tax of the entire cart
+        "cartPriceTaxes": [
+            {"tax":19,"taxRate":23,"price":19}
+        ]
+    }
+
+    return dummy_data
 
 if __name__ == "__main__":
     import uvicorn
