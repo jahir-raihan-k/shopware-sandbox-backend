@@ -3,14 +3,14 @@ import hmac, hashlib
 from fastapi import Request, HTTPException
 
 
-async def generate_hmac(data: bytes, key: str) -> str:
+def generate_hmac(data: bytes, key: str) -> str:
     """Return hex‑encoded HMAC‑SHA256 of data using key."""
     return hmac.new(key.encode('utf-8'), data, hashlib.sha256).hexdigest()
 
 
-async def verify_hmac(received_sig: str, data: bytes, key: str):
+def verify_hmac(received_sig: str, data: bytes, key: str):
     """Timing‑safe comparison of received_sig vs HMAC(data, key)."""
-    expected = await generate_hmac(data, key)
+    expected = generate_hmac(data, key)
     if not hmac.compare_digest(expected, received_sig):
         raise HTTPException(status_code=401, detail="Invalid signature")
 
@@ -22,7 +22,7 @@ async def verify_header_signature(request: Request, shop_secret: str, header_nam
     sig = request.headers.get(header_name)
     if sig is None:
         raise HTTPException(400, detail=f"Missing header: {header_name}")
-    await verify_hmac(sig, raw_qs, shop_secret)
+    verify_hmac(sig, raw_qs, shop_secret)
 
 
 async def verify_query_param_signature(
@@ -50,7 +50,7 @@ async def verify_query_param_signature(
         cleaned_query = cleaned_query[1:]
 
     # Validate signature against  cleaned original query string
-    await verify_hmac(sig, cleaned_query.encode(), shop_secret)
+    verify_hmac(sig, cleaned_query.encode(), shop_secret)
 
 
 async def verify_body_signature(request: Request, shop_secret: str,  header_name: str):
@@ -64,4 +64,4 @@ async def verify_body_signature(request: Request, shop_secret: str,  header_name
     if sig is None:
         raise HTTPException(400, detail=f"Missing header {header_name}")
 
-    await verify_hmac(sig, raw_body, shop_secret)
+    verify_hmac(sig, raw_body, shop_secret)
