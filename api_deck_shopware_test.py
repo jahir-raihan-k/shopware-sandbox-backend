@@ -142,7 +142,6 @@ def main():
     # 3. Authorize connection
     res = mgr.authorize_connection()
     assert res.get_connection_response is not None
-    print("Authorized:", res.get_connection_response)
 
     # 4. Fetch test products
     products = mgr.list_products(limit=10)
